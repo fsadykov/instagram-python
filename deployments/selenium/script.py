@@ -22,7 +22,7 @@ base_users = [
 ]
 
 WINDOW_SIZE = "1920,1080"
-
+base_url = 'https://www.instagram.com'
 if os.environ.get('CHROMEDRIVER_PATH') and os.environ.get('ING_USERNAME') and os.environ.get('ING_PASSWORD'):
     CHROMEDRIVER_PATH = os.environ.get('CHROMEDRIVER_PATH')
     USERNAME = os.environ.get('ING_USERNAME')
@@ -34,14 +34,11 @@ else:
 chrome_options = Options()  
 # chrome_options.add_argument("--headless")  
 # chrome_options.add_argument("--window-size=%s" % WINDOW_SIZE)
-
 driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH,
                           options=chrome_options
                          )
-
 logging.basicConfig(level=logging.WARNING)
 
-base_url = 'https://www.instagram.com'
 
 
 def instagram_login():
@@ -52,31 +49,28 @@ def instagram_login():
         driver.find_element_by_xpath('//*[@id="react-root"]/section/nav/div[2]/div/div/div[3]')
         logging.warning("You are already login!!")
     except:
-
         ## Wating until login page is loaded to be able to login
-        element_present = EC.presence_of_element_located((By.XPATH, '//*[@id="react-root"]/section/main/article/div[2]/div[1]/div/form/div[2]/div/label/input'))
+        element_present = EC.presence_of_element_located((By.XPATH, '//*/div/div[1]/div/label/input'))
         WebDriverWait(driver, 2).until(element_present)
-        
         ## Sending the username and password
-        username = driver.find_element_by_xpath('//*[@id="react-root"]/section/main/article/div[2]/div[1]/div/form/div[2]/div/label/input')
+        username = driver.find_element_by_xpath('//*/div/div[1]/div/label/input')
         username.send_keys(USERNAME)
-        password = driver.find_element_by_xpath('//*[@id="react-root"]/section/main/article/div[2]/div[1]/div/form/div[3]/div/label/input')
+        password = driver.find_element_by_xpath('//*/div/div[2]/div/label/input')
         password.send_keys(PASSWORD)
         password.send_keys(Keys.RETURN)
-
-        try:
-            ## Making sure that user is log in
-            element_present = EC.presence_of_element_located((By.XPATH, '//*[@id="react-root"]/section/nav/div[2]/div/div/div[3]'))
-            WebDriverWait(driver, 7).until(element_present)
-            logging.info("Script was able to login to system")
-        except TimeoutException:
-            logging.error("Script was not able to login timeout issue")
-    
+    try:
+        ## Making sure that user is log in
+        element_present = EC.presence_of_element_located((By.XPATH, '//*[@id="react-root"]/section/nav/div[2]/div/div/div[3]'))
+        WebDriverWait(driver, 7).until(element_present)
+        logging.info("Script was able to login to system")
+    except TimeoutException:
+        logging.error("Script was not able to login timeout issue")
+        
         
 
 
 def follow_all():
-    ## Following all people from 
+    ## Following all people from specific user
     time_to_sleep =  2 
     for i in range(2, 50):
         base_button_xpath = '/html/body/div[4]/div/div/div[2]/ul/div'
@@ -128,15 +122,15 @@ def main():
 
     instagram_login()
 
-    for username in base_users:
-        driver.get(f"{base_url}/{username}")
-        open_folloowers()
+    # for username in base_users:
+    #     driver.get(f"{base_url}/{username}")
+    #     open_folloowers()
 
-        for user in get_followers():
-            user.append(base_users)
+    #     for user in get_followers():
+    #         user.append(base_users)
 
-        save_to_file(base_users)
-        follow_all()
+    #     save_to_file(base_users)
+    #     follow_all()
 
 
 
